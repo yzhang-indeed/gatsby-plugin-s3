@@ -75,11 +75,13 @@ export interface PluginOptions {
     // but could be useful for preventing Cloud formation Stack Drift or suppressing Terraform noise if you don't need
     // the static website hosting functionality.
     enableS3StaticWebsiteHosting?: boolean;
+    HttpErrorCodeReturnedEquals?: string;
 }
 
 export const DEFAULT_OPTIONS: PluginOptions = {
     bucketName: '',
 
+    HttpErrorCodeReturnedEquals: '404',
     params: {},
     mergeCachingParams: true,
     generateRoutingRules: true,

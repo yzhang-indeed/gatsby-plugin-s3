@@ -17,7 +17,7 @@ const getRules = (pluginOptions: PluginOptions, routes: GatsbyRedirect[]): Routi
     routes.map(route => ({
         Condition: {
             KeyPrefixEquals: withoutLeadingSlash(route.fromPath),
-            HttpErrorCodeReturnedEquals: '404',
+            HttpErrorCodeReturnedEquals: pluginOptions.HttpErrorCodeReturnedEquals,
         },
         Redirect: {
             ReplaceKeyWith: withoutTrailingSlash(withoutLeadingSlash(route.toPath)),
@@ -77,10 +77,12 @@ export const onPostBuild = ({ store }: any, userPluginOptions: PluginOptions) =>
     }
 
     let rewrites: GatsbyRedirect[] = [];
+    let pageDataroutes: GatsbyRedirect[] = [];
     if (pluginOptions.generateMatchPathRewrites) {
-        rewrites = Array.from(pages.values())
-            .filter((page): page is Required<GatsbyPage> => !!page.matchPath && page.matchPath !== page.path)
-            .map(page => ({
+        const pathsToConfigure = Array.from(pages.values())
+            .filter((page): page is Required<GatsbyPage> => !!page.matchPath && page.matchPath !== page.path);
+        rewrites = 
+            pathsToConfigure.map(page => ({
                 // sort of (w)hack. https://i.giphy.com/media/iN5qfn8S2qVgI/giphy.webp
                 // the syntax that gatsby invented here does not work with routing rules.
                 // routing rules syntax is `/app/` not `/app/*` (it's basically prefix by default)
@@ -90,6 +92,17 @@ export const onPostBuild = ({ store }: any, userPluginOptions: PluginOptions) =>
                         : page.matchPath,
                 toPath: page.path,
             }));
+        pageDataroutes =
+            pathsToConfigure.map(page => ({
+                fromPath: 
+                    page.matchPath.endsWith('*')
+                        ? `page-data/${page.matchPath.substring(0, page.matchPath.length - 1)}`
+                        : `page-data/${page.matchPath}`,
+                toPath: page.path.endsWith('/') 
+                    ? `page-data/${page.path}page-data.json`
+                    : `page-data/${page.path}/page-data.json`,
+            }));
+        rewrites.concat(pageDataroutes);
     }
 
     if (pluginOptions.mergeCachingParams) {
