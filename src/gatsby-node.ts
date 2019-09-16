@@ -103,6 +103,8 @@ export const onPostBuild = ({ store }: any, userPluginOptions: PluginOptions) =>
                     : `page-data/${page.path}/page-data.json`,
             }));
         rewrites.concat(pageDataroutes);
+        console.log('PATHS, ', JSON.stringify(pathsToConfigure));
+        console.log('TRANSFORMED, ', JSON.stringify(rewrites));
     }
 
     if (pluginOptions.mergeCachingParams) {
