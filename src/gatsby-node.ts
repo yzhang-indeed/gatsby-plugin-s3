@@ -96,11 +96,12 @@ export const onPostBuild = ({ store }: any, userPluginOptions: PluginOptions) =>
             pathsToConfigure.map(page => ({
                 fromPath: 
                     page.matchPath.endsWith('*')
-                        ? `page-data${page.matchPath.substring(0, page.matchPath.length - 1)}`
-                        : `page-data${page.matchPath}`,
-                toPath: page.path.endsWith('/') 
-                    ? `page-data${page.path}page-data.json`
-                    : `page-data${page.path}/page-data.json`,
+                        ? `page-data/${withoutLeadingSlash(page.matchPath.substring(0, page.matchPath.length - 1))}`
+                        : `page-data/${withoutLeadingSlash(page.matchPath)}`,
+                toPath: 
+                    page.path.endsWith('/') 
+                        ? `page-data/${withoutLeadingSlash(page.path)}page-data.json`
+                        : `page-data/${withoutLeadingSlash(page.path)}/page-data.json`,
             }));
         rewrites = rewrites.concat(pageDataroutes);
     }
