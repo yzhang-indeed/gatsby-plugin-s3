@@ -76,15 +76,13 @@ exports.onPostBuild = ({ store }, userPluginOptions) => {
         pageDataroutes =
             pathsToConfigure.map(page => ({
                 fromPath: page.matchPath.endsWith('*')
-                    ? `page-data/${page.matchPath.substring(0, page.matchPath.length - 1)}`
-                    : `page-data/${page.matchPath}`,
+                    ? `page-data${page.matchPath.substring(0, page.matchPath.length - 1)}`
+                    : `page-data${page.matchPath}`,
                 toPath: page.path.endsWith('/')
-                    ? `page-data/${page.path}page-data.json`
-                    : `page-data/${page.path}/page-data.json`,
+                    ? `page-data${page.path}page-data.json`
+                    : `page-data${page.path}/page-data.json`,
             }));
         rewrites = rewrites.concat(pageDataroutes);
-        console.log('PATHS, ', JSON.stringify(pathsToConfigure));
-        console.log('TRANSFORMED, ', JSON.stringify(rewrites));
     }
     if (pluginOptions.mergeCachingParams) {
         params = Object.assign({}, params, constants_1.CACHING_PARAMS);
