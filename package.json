@@ -8,6 +8,7 @@
     "test": "jest",
     "prepublish": "npm run build",
     "build": "tsc --project .",
+    "postinstall": "npm run build",
     "typecheck": "tsc --project . --noEmit",
     "develop": "babel --extensions=\".ts\" --out-dir=. src/ -w",
     "snyk-protect": "snyk protect",
