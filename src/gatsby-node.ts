@@ -23,7 +23,7 @@ const getRules = (pluginOptions: PluginOptions, routes: GatsbyRedirect[]): Routi
         };
         if (pluginOptions.S3RedirectWithParams && !route.pageData) {
             delete Redirect.ReplaceKeyWith;
-            Redirect.ReplaceKeyPrefixWith = `${withoutTrailingSlash(withoutLeadingSlash(route.toPath))}?redirect=`;
+            Redirect.ReplaceKeyPrefixWith = `${withoutTrailingSlash(withoutLeadingSlash(route.toPath))}/?redirect=`;
         }
         return {
             Condition: {

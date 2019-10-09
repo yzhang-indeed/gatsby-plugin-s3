@@ -18,7 +18,7 @@ const getRules = (pluginOptions, routes) => (routes.map(route => {
     };
     if (pluginOptions.S3RedirectWithParams && !route.pageData) {
         delete Redirect.ReplaceKeyWith;
-        Redirect.ReplaceKeyPrefixWith = `${util_1.withoutTrailingSlash(util_1.withoutLeadingSlash(route.toPath))}?redirect=`;
+        Redirect.ReplaceKeyPrefixWith = `${util_1.withoutTrailingSlash(util_1.withoutLeadingSlash(route.toPath))}/?redirect=`;
     }
     return {
         Condition: {
