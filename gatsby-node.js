@@ -9,18 +9,25 @@ const path_1 = __importDefault(require("path"));
 const util_1 = require("./util");
 // converts gatsby redirects + rewrites to S3 routing rules
 // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration-routingrules.html
-const getRules = (pluginOptions, routes) => (routes.map(route => ({
-    Condition: {
-        KeyPrefixEquals: util_1.withoutLeadingSlash(route.fromPath),
-        HttpErrorCodeReturnedEquals: pluginOptions.HttpErrorCodeReturnedEquals,
-    },
-    Redirect: {
+const getRules = (pluginOptions, routes) => (routes.map(route => {
+    const Redirect = {
         ReplaceKeyWith: util_1.withoutTrailingSlash(util_1.withoutLeadingSlash(route.toPath)),
         HttpRedirectCode: route.isPermanent ? '301' : '302',
         Protocol: pluginOptions.protocol,
         HostName: pluginOptions.hostname,
-    },
-})));
+    };
+    if (pluginOptions.S3RedirectWithParams && !route.pageData) {
+        delete Redirect.ReplaceKeyWith;
+        Redirect.ReplaceKeyPrefixWith = `${util_1.withoutTrailingSlash(util_1.withoutLeadingSlash(route.toPath))}?redirect=`;
+    }
+    return {
+        Condition: {
+            KeyPrefixEquals: util_1.withoutLeadingSlash(route.fromPath),
+            HttpErrorCodeReturnedEquals: pluginOptions.HttpErrorCodeReturnedEquals,
+        },
+        Redirect,
+    };
+}));
 let params = {};
 exports.onPreBootstrap = ({ reporter }, { bucketName }) => {
     if (!bucketName) {
@@ -81,6 +88,7 @@ exports.onPostBuild = ({ store }, userPluginOptions) => {
                 toPath: page.path.endsWith('/')
                     ? `page-data/${util_1.withoutLeadingSlash(page.path)}page-data.json`
                     : `page-data/${util_1.withoutLeadingSlash(page.path)}/page-data.json`,
+                pageData: true,
             }));
         rewrites = rewrites.concat(pageDataroutes);
     }

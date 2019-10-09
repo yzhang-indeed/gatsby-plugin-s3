@@ -22,6 +22,7 @@ exports.DEFAULT_OPTIONS = {
     generateMatchPathRewrites: true,
     removeNonexistentObjects: true,
     enableS3StaticWebsiteHosting: true,
+    S3RedirectWithParams: false,
 };
 // https://www.gatsbyjs.org/docs/caching/
 exports.CACHING_PARAMS = {
