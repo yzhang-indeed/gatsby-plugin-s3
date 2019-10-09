@@ -14,18 +14,25 @@ interface ServerlessRoutingRule {
 // converts gatsby redirects + rewrites to S3 routing rules
 // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration-routingrules.html
 const getRules = (pluginOptions: PluginOptions, routes: GatsbyRedirect[]): RoutingRules => (
-    routes.map(route => ({
-        Condition: {
-            KeyPrefixEquals: withoutLeadingSlash(route.fromPath),
-            HttpErrorCodeReturnedEquals: pluginOptions.HttpErrorCodeReturnedEquals,
-        },
-        Redirect: {
+    routes.map(route => {
+        const Redirect: any = {
             ReplaceKeyWith: withoutTrailingSlash(withoutLeadingSlash(route.toPath)),
             HttpRedirectCode: route.isPermanent ? '301' : '302',
             Protocol: pluginOptions.protocol,
             HostName: pluginOptions.hostname,
-        },
-    }))
+        };
+        if (pluginOptions.S3RedirectWithParams && !route.pageData) {
+            delete Redirect.ReplaceKeyWith;
+            Redirect.ReplaceKeyPrefixWith = `${withoutTrailingSlash(withoutLeadingSlash(route.toPath))}?redirect=`;
+        }
+        return {
+            Condition: {
+                KeyPrefixEquals: withoutLeadingSlash(route.fromPath),
+                HttpErrorCodeReturnedEquals: pluginOptions.HttpErrorCodeReturnedEquals,
+            },
+            Redirect,
+        };
+    })
 );
 
 let params: Params = {};
@@ -102,6 +109,7 @@ export const onPostBuild = ({ store }: any, userPluginOptions: PluginOptions) =>
                     page.path.endsWith('/') 
                         ? `page-data/${withoutLeadingSlash(page.path)}page-data.json`
                         : `page-data/${withoutLeadingSlash(page.path)}/page-data.json`,
+                pageData: true,
             }));
         rewrites = rewrites.concat(pageDataroutes);
     }

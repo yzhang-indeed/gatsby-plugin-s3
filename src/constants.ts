@@ -76,6 +76,10 @@ export interface PluginOptions {
     // the static website hosting functionality.
     enableS3StaticWebsiteHosting?: boolean;
     HttpErrorCodeReturnedEquals?: string;
+    // does it carry over the rest of sequence of url to the client app
+    // eg me/something/something becomes me?redirect=/something/something
+    // then can resolve client route on did mount
+    S3RedirectWithParams?: boolean;
 }
 
 export const DEFAULT_OPTIONS: PluginOptions = {
@@ -91,6 +95,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
     generateMatchPathRewrites: true,
     removeNonexistentObjects: true,
     enableS3StaticWebsiteHosting: true,
+    S3RedirectWithParams: false,
 };
 
 // https://www.gatsbyjs.org/docs/caching/

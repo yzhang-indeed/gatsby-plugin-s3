@@ -5,6 +5,7 @@ interface GatsbyRedirect {
     fromPath: string;
     toPath: string;
     isPermanent?: boolean;
+    pageData?: boolean;
 }
 
 interface GatsbyPage {
