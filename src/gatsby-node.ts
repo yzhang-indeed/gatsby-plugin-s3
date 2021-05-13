@@ -160,7 +160,7 @@ Try setting the 'generateRedirectObjectsForPermanentRedirects' configuration opt
     const newRoutingRules: string[] = [...JSON.stringify(routingRules), ...JSON.stringify(originalRoutingRules)];
     fs.writeFileSync(
        path.join(program.directory, './.cache/s3.routingRules.json'),
-       JSON.stringify(newRoutingRules)   
+       JSON.stringify(newRoutingRules)
    );
 
     const originalSlsRoutingRules = fs.readFileSync(path.join(program.directory, './.cache/s3.sls.routingRules.json'));
@@ -168,8 +168,8 @@ Try setting the 'generateRedirectObjectsForPermanentRedirects' configuration opt
        [...JSON.stringify(slsRoutingRules), ...JSON.stringify(originalSlsRoutingRules)];
     fs.writeFileSync(
        path.join(program.directory, './.cache/s3.sls.routingRules.json'),
-       JSON.stringify(newSlsRoutingRules)   
-   );  
+       JSON.stringify(newSlsRoutingRules)
+   );
 
     if (pluginOptions.generateRedirectObjectsForPermanentRedirects) {
         fs.writeFileSync(
