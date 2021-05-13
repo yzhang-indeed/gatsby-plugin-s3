@@ -120,8 +120,12 @@ Try setting the 'generateRedirectObjectsForPermanentRedirects' configuration opt
             RedirectRule: Redirect,
         }));
     }
-    fs_1.default.writeFileSync(path_1.default.join(program.directory, './.cache/s3.routingRules.json'), JSON.stringify(routingRules));
-    fs_1.default.writeFileSync(path_1.default.join(program.directory, './.cache/s3.sls.routingRules.json'), JSON.stringify(slsRoutingRules));
+    const originalRoutingRules = fs_1.default.readFileSync(path_1.default.join(program.directory, './.cache/s3.routingRules.json'));
+    const newRoutingRules = [...JSON.stringify(routingRules), ...JSON.stringify(originalRoutingRules)];
+    fs_1.default.writeFileSync(path_1.default.join(program.directory, './.cache/s3.routingRules.json'), JSON.stringify(newRoutingRules));
+    const originalSlsRoutingRules = fs_1.default.readFileSync(path_1.default.join(program.directory, './.cache/s3.sls.routingRules.json'));
+    const newSlsRoutingRules = [...JSON.stringify(slsRoutingRules), ...JSON.stringify(originalSlsRoutingRules)];
+    fs_1.default.writeFileSync(path_1.default.join(program.directory, './.cache/s3.sls.routingRules.json'), JSON.stringify(newSlsRoutingRules));
     if (pluginOptions.generateRedirectObjectsForPermanentRedirects) {
         fs_1.default.writeFileSync(path_1.default.join(program.directory, './.cache/s3.redirectObjects.json'), JSON.stringify(permanentRedirects));
     }
