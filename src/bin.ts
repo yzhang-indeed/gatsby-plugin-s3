@@ -191,13 +191,22 @@ const deploy = async ({ yes, bucket }: { yes: boolean, bucket: string }) => {
                 const curConfig = await s3.getBucketWebsite(currentWebSiteConfig).promise();
                 console.log(curConfig.RoutingRules, 'curConfig.RoutingRules');
                 if (curConfig.RoutingRules && curConfig.RoutingRules.length) {
-                    websiteConfig.WebsiteConfiguration.RoutingRules = [...curConfig.RoutingRules, ...routingRules];
+                    let newRoutingRules = [...curConfig.RoutingRules, ...routingRules];
+                    const newObj: {[key: string]: any } = {};
+                    newRoutingRules = newRoutingRules.reduce((preVal: S3.RoutingRule[], curVal) => {
+                        if (curVal && curVal.Condition && curVal.Condition.KeyPrefixEquals) {
+                            newObj[curVal.Condition.KeyPrefixEquals] = preVal.push(curVal);
+                        }
+                        return preVal;
+                    }, []);
+        
+                    websiteConfig.WebsiteConfiguration.RoutingRules = newRoutingRules;
                 } else {
                     websiteConfig.WebsiteConfiguration.RoutingRules = routingRules;
                 }
                 
             }
-            console.log(websiteConfig, 'websiteConfig');
+            console.log(websiteConfig.WebsiteConfiguration.RoutingRules, 'WebRoutingRules');
             await s3.putBucketWebsite(websiteConfig).promise();
         }
 
