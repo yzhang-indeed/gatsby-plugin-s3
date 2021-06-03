@@ -153,7 +153,26 @@ const deploy = async ({ yes, bucket }) => {
                 },
             };
             if (routingRules.length) {
-                websiteConfig.WebsiteConfiguration.RoutingRules = routingRules;
+                const currentWebSiteConfig = {
+                    Bucket: config.bucketName,
+                };
+                const curConfig = await s3.getBucketWebsite(currentWebSiteConfig).promise();
+                if (curConfig.RoutingRules && curConfig.RoutingRules.length) {
+                    let newRoutingRules = [...curConfig.RoutingRules, ...routingRules];
+                    const obj = {};
+                    newRoutingRules = newRoutingRules.reduce((item, next) => {
+                        if (next && next.Condition && next.Condition.KeyPrefixEquals
+                            && !obj[next.Condition.KeyPrefixEquals]) {
+                            item.push(next);
+                            obj[next.Condition.KeyPrefixEquals] = true;
+                        }
+                        return item;
+                    }, []);
+                    websiteConfig.WebsiteConfiguration.RoutingRules = newRoutingRules;
+                }
+                else {
+                    websiteConfig.WebsiteConfiguration.RoutingRules = routingRules;
+                }
             }
             await s3.putBucketWebsite(websiteConfig).promise();
         }
