@@ -183,11 +183,13 @@ const deploy = async ({ yes, bucket }: { yes: boolean, bucket: string }) => {
                 },
             };
 
+            console.log(routingRules, 'routingRules');
             if (routingRules.length) {
                 const currentWebSiteConfig: S3.Types.GetBucketWebsiteRequest = {
                     Bucket: config.bucketName,
                 };
                 const curConfig = await s3.getBucketWebsite(currentWebSiteConfig).promise();
+                console.log(curConfig, 'curConfig');
                 if (curConfig.RoutingRules && curConfig.RoutingRules.length) {
                     websiteConfig.WebsiteConfiguration.RoutingRules = [...curConfig.RoutingRules, ...routingRules];
                 } else {
@@ -195,7 +197,7 @@ const deploy = async ({ yes, bucket }: { yes: boolean, bucket: string }) => {
                 }
                 
             }
-
+            console.log(websiteConfig, 'websiteConfig');
             await s3.putBucketWebsite(websiteConfig).promise();
         }
 
