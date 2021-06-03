@@ -152,21 +152,21 @@ const deploy = async ({ yes, bucket }) => {
                     },
                 },
             };
-            console.log(routingRules, 'routingRules');
             if (routingRules.length) {
                 const currentWebSiteConfig = {
                     Bucket: config.bucketName,
                 };
                 const curConfig = await s3.getBucketWebsite(currentWebSiteConfig).promise();
-                console.log(curConfig.RoutingRules, 'curConfig.RoutingRules');
                 if (curConfig.RoutingRules && curConfig.RoutingRules.length) {
                     let newRoutingRules = [...curConfig.RoutingRules, ...routingRules];
-                    const newObj = {};
-                    newRoutingRules = newRoutingRules.reduce((preVal, curVal) => {
-                        if (curVal && curVal.Condition && curVal.Condition.KeyPrefixEquals) {
-                            newObj[curVal.Condition.KeyPrefixEquals] = preVal.push(curVal);
+                    const obj = {};
+                    newRoutingRules = newRoutingRules.reduce((item, next) => {
+                        if (next && next.Condition && next.Condition.KeyPrefixEquals
+                            && !obj[next.Condition.KeyPrefixEquals]) {
+                            item.push(next);
+                            obj[next.Condition.KeyPrefixEquals] = true;
                         }
-                        return preVal;
+                        return item;
                     }, []);
                     websiteConfig.WebsiteConfiguration.RoutingRules = newRoutingRules;
                 }
@@ -174,7 +174,6 @@ const deploy = async ({ yes, bucket }) => {
                     websiteConfig.WebsiteConfiguration.RoutingRules = routingRules;
                 }
             }
-            console.log(websiteConfig.WebsiteConfiguration.RoutingRules, 'WebRoutingRules');
             await s3.putBucketWebsite(websiteConfig).promise();
         }
         spinner.text = 'Listing objects...';
