@@ -183,30 +183,28 @@ const deploy = async ({ yes, bucket }: { yes: boolean, bucket: string }) => {
                 },
             };
 
-            console.log(routingRules, 'routingRules');
             if (routingRules.length) {
                 const currentWebSiteConfig: S3.Types.GetBucketWebsiteRequest = {
                     Bucket: config.bucketName,
                 };
                 const curConfig = await s3.getBucketWebsite(currentWebSiteConfig).promise();
-                console.log(curConfig.RoutingRules, 'curConfig.RoutingRules');
                 if (curConfig.RoutingRules && curConfig.RoutingRules.length) {
                     let newRoutingRules = [...curConfig.RoutingRules, ...routingRules];
-                    const newObj: {[key: string]: any } = {};
-                    newRoutingRules = newRoutingRules.reduce((preVal: S3.RoutingRule[], curVal) => {
-                        if (curVal && curVal.Condition && curVal.Condition.KeyPrefixEquals) {
-                            newObj[curVal.Condition.KeyPrefixEquals] = preVal.push(curVal);
+                    const obj: {[key: string]: boolean; } = {};
+                    newRoutingRules = newRoutingRules.reduce((item: S3.RoutingRule[], next) => {
+                        if (next && next.Condition && next.Condition.KeyPrefixEquals 
+                            && !obj[next.Condition.KeyPrefixEquals]) {
+                            item.push(next);
+                            obj[next.Condition.KeyPrefixEquals] = true;
                         }
-                        return preVal;
+                        return item;
                     }, []);
-        
                     websiteConfig.WebsiteConfiguration.RoutingRules = newRoutingRules;
                 } else {
                     websiteConfig.WebsiteConfiguration.RoutingRules = routingRules;
                 }
                 
             }
-            console.log(websiteConfig.WebsiteConfiguration.RoutingRules, 'WebRoutingRules');
             await s3.putBucketWebsite(websiteConfig).promise();
         }
 
